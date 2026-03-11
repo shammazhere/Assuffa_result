@@ -4,14 +4,16 @@ import { AuthProvider } from './context/AuthContext';
 import { ProtectedAdminRoute, ProtectedStudentRoute } from './components/ProtectedRoutes';
 
 // Lazy load pages for better performance
-const StudentLogin = React.lazy(() => import('./pages/StudentLogin'));
-const StudentResult = React.lazy(() => import('./pages/StudentResult'));
+import StudentLogin from './pages/StudentLogin';
+import StudentResult from './pages/StudentResult';
+import StudentResultOnline from './pages/StudentResultOnline';
 const AdminLogin = React.lazy(() => import('./pages/admin/AdminLogin'));
 const AdminDashboard = React.lazy(() => import('./layouts/AdminDashboard'));
 const ClassesManager = React.lazy(() => import('./pages/admin/ClassesManager'));
 const SubjectsManager = React.lazy(() => import('./pages/admin/SubjectsManager'));
 const StudentsManager = React.lazy(() => import('./pages/admin/StudentsManager'));
 const MarksManager = React.lazy(() => import('./pages/admin/MarksManager'));
+const BulkUpload = React.lazy(() => import('./pages/admin/BulkUpload'));
 
 function App() {
   return (
@@ -26,6 +28,7 @@ function App() {
             {/* Protected Student Routes */}
             <Route element={<ProtectedStudentRoute />}>
               <Route path="/result" element={<StudentResult />} />
+              <Route path="/online-result" element={<StudentResultOnline />} />
             </Route>
 
             {/* Protected Admin Routes */}
@@ -36,6 +39,7 @@ function App() {
                 <Route path="subjects" element={<SubjectsManager />} />
                 <Route path="students" element={<StudentsManager />} />
                 <Route path="marks" element={<MarksManager />} />
+                <Route path="upload" element={<BulkUpload />} />
               </Route>
             </Route>
 

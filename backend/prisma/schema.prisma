@@ -1,10 +1,12 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-1.0.x", "rhel-openssl-3.0.x"]
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Admin {
@@ -15,9 +17,12 @@ model Admin {
 
 model Class {
   id       String    @id @default(uuid())
-  name     String    @unique
+  name     String
+  type     String    @default("Offline")
   students Student[]
   subjects Subject[]
+
+  @@unique([name, type])
 }
 
 model Student {

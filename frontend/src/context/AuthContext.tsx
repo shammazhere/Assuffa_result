@@ -1,24 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import api from '../config/api';
-
-interface Mark {
-    subject: string;
-    total: number;
-    grade: string;
-}
-
-interface Student {
-    id: string;
-    first_name: string;
-    usn: string;
-    className: string;
-    marks: Mark[];
-}
+import type { StudentItem } from '../types';
 
 interface AuthContextType {
-    student: Student | null;
+    student: StudentItem | null;
     adminToken: string | null;
-    studentLogin: (usn: string, dob: string) => Promise<void>;
+    studentLogin: (usn: string, dob: string) => Promise<StudentItem>;
     adminLogin: (username: string, password: string) => Promise<void>;
     logout: () => void;
     isLoading: boolean;
@@ -27,7 +14,10 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [student, setStudent] = useState<Student | null>(null);
+    const [student, setStudent] = useState<StudentItem | null>(() => {
+        const saved = localStorage.getItem('studentData');
+        return saved ? JSON.parse(saved) : null;
+    });
     const [adminToken, setAdminToken] = useState<string | null>(localStorage.getItem('adminToken'));
     const [isLoading, setIsLoading] = useState(false);
 
@@ -39,11 +29,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     }, [adminToken]);
 
+    useEffect(() => {
+        if (student) {
+            localStorage.setItem('studentData', JSON.stringify(student));
+        } else {
+            localStorage.removeItem('studentData');
+        }
+    }, [student]);
+
     const studentLogin = async (usn: string, dob: string) => {
         setIsLoading(true);
         try {
             const response = await api.post('/auth/student/login', { usn, dob });
             setStudent(response.data);
+            return response.data;
         } finally {
             setIsLoading(false);
         }
